@@ -1,0 +1,54 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dextra"
+version = "0.2.0"
+description = "A statically typed compiled programming language built from scratch in Python."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Dextra Contributors" }]
+keywords = ["compiler", "language", "llvm", "static-typing"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Topic :: Software Development :: Compilers",
+    "License :: OSI Approved :: MIT License",
+]
+dependencies = [
+    # llvmlite 0.42+ ships LLVM 14; 0.44+ ships LLVM 15 (current test target).
+    # We use the `binding.parse_assembly` / `ModuleRef.verify` /
+    # `Target.from_default_triple` / `TargetMachine.emit_object` APIs,
+    # plus `ir.Context` / `IdentifiedStructType` / `IRBuilder`.
+    #
+    # IMPORTANT: Dextra does NOT call `llvm.initialize()` (the deprecated
+    # core init).  Modern llvmlite (≥0.42) auto-initializes the LLVM core
+    # lazily on first use.  We DO still call `llvm.initialize_native_target()`
+    # and `llvm.initialize_native_asmprinter()` — these are required for
+    # `Target.from_default_triple()` and `TargetMachine.emit_object()`
+    # respectively, and are not deprecated.
+    #
+    # If a future llvmlite version removes or deprecates the native_target /
+    # native_asmprinter init calls, this is the single place to update
+    # (see `src/dextra/codegen/llvm_runtime.py`).
+    "llvmlite>=0.42",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+]
+
+[project.scripts]
+dextra = "dextra.cli.main:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"dextra.runtime" = ["runtime.c"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

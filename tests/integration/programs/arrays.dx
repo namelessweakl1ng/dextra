@@ -1,0 +1,9 @@
+fn main() -> Int {
+    let numbers = [1, 2, 3, 4, 5]
+    let mut total = 0
+    for n in numbers {
+        total = total + n
+    }
+    println(total)
+    return 0
+}

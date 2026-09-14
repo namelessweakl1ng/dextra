@@ -1,0 +1,19 @@
+fn main() -> Int {
+    let mut i = 0
+    while i < 5 {
+        println(i)
+        i = i + 1
+    }
+
+    for j in 0..10 {
+        println(j)
+    }
+
+    let mut sum = 0
+    for k in 1..101 {
+        sum = sum + k
+    }
+    println(sum)
+
+    return 0
+}

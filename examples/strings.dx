@@ -1,0 +1,12 @@
+fn main() -> Int {
+    let name = "Dextra"
+    let greeting = "Hello, " + name
+    println(greeting)
+
+    let s = "line1\nline2"
+    println(s)
+
+    let empty = ""
+    println(empty)
+    return 0
+}

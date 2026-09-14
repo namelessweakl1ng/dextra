@@ -1,0 +1,16 @@
+fn main() -> Int {
+    let x = 10
+    let mut y = 20
+    let name = "Alice"
+    let active = true
+
+    println(x)
+    println(y)
+    println(name)
+    println(active)
+
+    y = 30
+    println(y)
+
+    return 0
+}

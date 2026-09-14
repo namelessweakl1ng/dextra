@@ -1,0 +1,17 @@
+fn main() -> Int {
+    let a = 7
+    let b = 2
+
+    println(a + b)
+    println(a - b)
+    println(a * b)
+    println(a / b)
+    println(a % b)
+
+    let pi = 3.14
+    let r = 2.0
+    let area = pi * r * r
+    println(area)
+
+    return 0
+}

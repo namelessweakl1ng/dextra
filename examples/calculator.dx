@@ -1,0 +1,26 @@
+// Simple interactive calculator: parse a hard-coded expression and print it.
+// Demonstrates functions, conditionals, arithmetic, and string concat.
+
+fn op(a: Int, b: Int, code: Int) -> Int {
+    if code == 0 {
+        return a + b
+    } else if code == 1 {
+        return a - b
+    } else if code == 2 {
+        return a * b
+    } else if code == 3 {
+        if b == 0 {
+            return 0
+        }
+        return a / b
+    }
+    return 0
+}
+
+fn main() -> Int {
+    let x = 6
+    let y = 7
+    println(op(x, y, 0))   // 42
+    println(op(x, y, 2))   // 42
+    return 0
+}

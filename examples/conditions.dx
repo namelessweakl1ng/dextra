@@ -1,0 +1,26 @@
+fn main() -> Int {
+    let x = 10
+
+    if x > 5 {
+        println("big")
+    } else {
+        println("small")
+    }
+
+    if x > 100 {
+        println("huge")
+    } else if x > 50 {
+        println("large")
+    } else if x > 5 {
+        println("medium")
+    } else {
+        println("tiny")
+    }
+
+    let ready = true
+    if ready {
+        println("ready")
+    }
+
+    return 0
+}

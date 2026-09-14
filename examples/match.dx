@@ -1,0 +1,53 @@
+// Match: demonstrate pattern matching on enums.
+
+enum Status {
+    Pending,
+    Active,
+    Closed
+}
+
+fn status_label(s: Status) -> String {
+    return match s {
+        Status.Pending => "pending",
+        Status.Active => "active",
+        Status.Closed => "closed",
+    }
+}
+
+fn is_terminal(s: Status) -> Bool {
+    return match s {
+        Status.Pending => false,
+        Status.Active => false,
+        Status.Closed => true,
+    }
+}
+
+fn next_status(s: Status) -> Status {
+    return match s {
+        Status.Pending => Status.Active,
+        Status.Active => Status.Closed,
+        Status.Closed => Status.Closed,
+    }
+}
+
+fn main() -> Int {
+    let s = Status.Pending
+    println(status_label(s))
+    println(is_terminal(s))
+
+    let s2 = next_status(s)
+    println(status_label(s2))
+
+    let s3 = next_status(s2)
+    println(status_label(s3))
+    println(is_terminal(s3))
+
+    // Wildcard match arm
+    let s4 = Status.Active
+    match s4 {
+        Status.Pending => println("still pending"),
+        _ => println("not pending"),
+    }
+
+    return 0
+}

@@ -1,0 +1,27 @@
+struct User {
+    name: String,
+    age: Int
+}
+
+fn greet(user: User) -> String {
+    return "Hello, " + user.name
+}
+
+fn main() -> Int {
+    let alice = User {
+        name: "Alice",
+        age: 21
+    }
+
+    println(alice.name)
+    println(alice.age)
+    println(greet(alice))
+
+    let bob = User {
+        name: "Bob",
+        age: 25
+    }
+    println(bob.name)
+
+    return 0
+}

@@ -1,0 +1,19 @@
+fn factorial(n: Int) -> Int {
+    if n <= 1 {
+        return 1
+    }
+    return n * factorial(n - 1)
+}
+
+fn fib(n: Int) -> Int {
+    if n < 2 {
+        return n
+    }
+    return fib(n - 1) + fib(n - 2)
+}
+
+fn main() -> Int {
+    println(factorial(10))
+    println(fib(15))
+    return 0
+}

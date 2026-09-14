@@ -1,0 +1,15 @@
+fn fib(n: Int) -> Int {
+    if n < 2 {
+        return n
+    }
+    return fib(n - 1) + fib(n - 2)
+}
+
+fn main() -> Int {
+    let mut i = 0
+    while i <= 20 {
+        println(fib(i))
+        i = i + 1
+    }
+    return 0
+}

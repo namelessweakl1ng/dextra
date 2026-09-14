@@ -1,0 +1,45 @@
+// Enums: demonstrate enum declarations and variant references.
+
+enum Color {
+    Red,
+    Green,
+    Blue
+}
+
+enum Direction {
+    North,
+    South,
+    East,
+    West
+}
+
+fn color_name(c: Color) -> String {
+    return match c {
+        Color.Red => "red",
+        Color.Green => "green",
+        Color.Blue => "blue",
+    }
+}
+
+fn turn(d: Direction) -> Direction {
+    return match d {
+        Direction.North => Direction.East,
+        Direction.East => Direction.South,
+        Direction.South => Direction.West,
+        Direction.West => Direction.North,
+    }
+}
+
+fn main() -> Int {
+    let c = Color.Green
+    println(color_name(c))
+
+    let mut d = Direction.North
+    let mut i = 0
+    while i < 4 {
+        d = turn(d)
+        i = i + 1
+    }
+
+    return 0
+}

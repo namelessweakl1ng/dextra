@@ -1,0 +1,17 @@
+fn main() -> Int {
+    let numbers = [10, 20, 30, 40, 50]
+    let mut total = 0
+
+    for n in numbers {
+        total = total + n
+    }
+
+    println(total)
+    println(numbers[2])
+
+    let mut xs = [1, 2, 3]
+    xs[0] = 99
+    println(xs[0])
+
+    return 0
+}

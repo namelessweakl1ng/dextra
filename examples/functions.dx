@@ -1,0 +1,13 @@
+fn add(a: Int, b: Int) -> Int {
+    return a + b
+}
+
+fn greet(name: String) -> String {
+    return "Hello, " + name
+}
+
+fn main() -> Int {
+    println(add(3, 4))
+    println(greet("World"))
+    return 0
+}

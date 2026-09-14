@@ -1,0 +1,6 @@
+struct User { name: String }
+
+fn main() -> Int {
+    let u = User { bogus: 1 }
+    return 0
+}

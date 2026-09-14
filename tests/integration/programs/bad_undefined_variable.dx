@@ -1,0 +1,4 @@
+fn main() -> Int {
+    println(missing_var)
+    return 0
+}

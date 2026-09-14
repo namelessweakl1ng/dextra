@@ -1,0 +1,14 @@
+struct User {
+    name: String,
+    age: Int
+}
+
+fn main() -> Int {
+    let u = User {
+        name: "Alice",
+        age: 21
+    }
+    println(u.name)
+    println(u.age)
+    return 0
+}

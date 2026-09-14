@@ -1,0 +1,14 @@
+fn factorial(n: Int) -> Int {
+    if n <= 1 {
+        return 1
+    }
+    let rest = factorial(n - 1)
+    return n * rest
+}
+
+fn main() -> Int {
+    for i in 1..11 {
+        println(factorial(i))
+    }
+    return 0
+}
