@@ -199,9 +199,9 @@ The Dextra runtime (`runtime/runtime.c`) provides:
 * `dx_string_new`, `dx_string_concat`, `dx_string_print`, `dx_string_println`, `dx_string_length`.
 * `dx_print_int`, `dx_print_float`, `dx_print_bool`, `dx_println_int`, etc.
 * `DxArray` — a length-prefixed, type-erased array.
-* `dx_array_new_int(n)`, `dx_array_get_int`, `dx_array_set_int`.
+* `dx_array_new(n)`, `dx_array_get`, `dx_array_set`.
 
-The runtime is deliberately minimal. Memory is allocated with `malloc` and never freed in v0.2.0; this is documented in `docs/language-spec.md`.
+The runtime is deliberately minimal. Memory is allocated with `malloc` and never freed in v0.2.0.
 
 ## 6. Testing Strategy
 

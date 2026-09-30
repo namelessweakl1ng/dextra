@@ -14,7 +14,7 @@ Type
 │   └── Void
 ├── ArrayType          { element_type: Type }
 ├── StructType         { name, fields: list[(name, Type)] }
-├── EnumType           { name, variants: dict[name, tag] }
+├── EnumType           { enum_name: str, variant_names: tuple[str, ...] }
 └── FunctionType       { params: list[Type], return_type: Type }
 ```
 
@@ -88,7 +88,9 @@ Mixing `Int` and `Float` operands is a **type error** (no implicit promotion in 
 | `== !=`| same type, scalar only      | `Bool` |
 | `< > <= >=` | `Int` or `Float` (same) | `Bool` |
 
-Comparing `String`s with `<` is a type error in v0.2.0. `==` on strings is allowed and lowered to a runtime `strcmp`-based check.
+Comparing `String`s with `<` is a type error in v0.2.0. `==` on strings is
+allowed and lowered to a runtime check that compares lengths first, then the
+exact bytes with `memcmp`.
 
 ### 2.4 Boolean
 
