@@ -14,6 +14,9 @@ venv/
 *.out
 *.exe
 *.bad.ll
+# Examples are source-only; builds default to an extensionless sibling binary.
+/examples/*
+!/examples/*.dx
 
 # Coverage / tooling
 .coverage

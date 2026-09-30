@@ -166,7 +166,7 @@ fn name(param: Type, ...) -> ReturnType {
 ```
 
 * `main` is the program entry point and must return `Int`.
-* `main` may take no parameters in v0.2.0.
+* The compiler currently does not restrict the parameters declared by `main`.
 * All paths through a non-`Void` function must end in a control-flow exit;
   falling through is a compile-time error (`E0218`).
 * Functions may be recursive.
