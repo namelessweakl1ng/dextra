@@ -13,8 +13,7 @@ The Dextra IR sits between the typed AST and LLVM IR. Its purpose:
 class Module:
     name: str
     functions: list[Function]
-    globals: list[Global]
-    externals: list[ExternalFunction]
+    string_literals: dict[str, Temp]
 ```
 
 ## 2. Function
@@ -23,10 +22,9 @@ class Module:
 @dataclass
 class Function:
     name: str
-    return_type: DextraType
-    params: list[Parameter]
+    return_type: Type
+    params: list[Param]
     blocks: list[BasicBlock]
-    locals: list[Local]   # alloca'd
 
     @property
     def entry(self) -> BasicBlock: ...
@@ -52,11 +50,13 @@ A block has zero or more non-terminator instructions followed by exactly one ter
 ```python
 @dataclass
 class Value:
-    type: DextraType
+    type: Type
 
 @dataclass
-class Constant(Value):
-    value: int | float | bool | str
+class ConstInt(Value):
+    value: int
+
+# ConstFloat, ConstBool, and ConstString carry their respective values.
 
 @dataclass
 class Local(Value):       # an alloca'd slot
@@ -65,6 +65,7 @@ class Local(Value):       # an alloca'd slot
 @dataclass
 class Param(Value):
     index: int
+    name: str
 
 @dataclass
 class Temp(Value):        # an SSA temporary
@@ -88,7 +89,6 @@ class Temp(Value):        # an SSA temporary
 | `ArrayLit(elements)` | `list[Value]` | `Temp` |
 | `StructLit(struct_name, fields)` | `list[Value]` | `Temp` |
 | `StringLit(value)` | `str` | `Temp` |
-| `Coerce(value, type)` | `Value`, `Type` | `Temp` (used for `Int`→`Float` if added later) |
 
 ## 6. Terminators
 
@@ -183,4 +183,6 @@ while __i < __end {
 
 ## 9. Validation
 
-The IR module exposes `Module.validate()` which checks all invariants above and returns a list of human-readable error strings. This is invoked from the test suite to catch IR construction bugs.
+`dextra.ir.verifier.verify_module(module, ctx)` returns validation errors.
+`assert_module_valid(module, ctx)` raises on invalid IR and is called by the
+compiler pipeline before LLVM generation. `Module` has no `validate()` method.

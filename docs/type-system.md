@@ -77,7 +77,7 @@ Implications:
 | `/` | Float  | Float  | Float  | |
 | `+` | String | String | String | string concat (lowered to runtime call) |
 
-Mixing `Int` and `Float` operands is a **type error** (no implicit promotion in v0.1).
+Mixing `Int` and `Float` operands is a **type error** (no implicit promotion in v0.2.0).
 
 ### 2.3 Comparison
 
@@ -86,7 +86,7 @@ Mixing `Int` and `Float` operands is a **type error** (no implicit promotion in 
 | `== !=`| same type, scalar only      | `Bool` |
 | `< > <= >=` | `Int` or `Float` (same) | `Bool` |
 
-Comparing `String`s with `<` is a type error in v0.1. `==` on strings is allowed and lowered to a runtime `strcmp`-based check.
+Comparing `String`s with `<` is a type error in v0.2.0. `==` on strings is allowed and lowered to the length-aware runtime `dx_string_eq` check.
 
 ### 2.4 Boolean
 
@@ -168,7 +168,7 @@ If an explicit annotation is present (`let x: T = e`), the inferred type of `e` 
 
 ## 5. Type Compatibility
 
-Dextra has **no implicit conversions** in v0.1. The following are all errors:
+Dextra has **no implicit conversions** in v0.2.0. The following are all errors:
 
 ```dextra
 let x: Int = 1.5           // E0200
@@ -215,9 +215,9 @@ let s: String = "a" + 1    // E0200 (Int ≠ String)
   prove the runtime value is zero). The behavior at runtime is undefined.
 * **Floating-point division by 0.0** produces `±Inf` or `NaN` per IEEE 754.
   This is also warned about at compile time when the divisor is a literal.
-* **Out-of-bounds array access** is **undefined behavior** in v0.1.
+* **Out-of-bounds array access** is **undefined behavior** in v0.2.0.
   Bounds checking is planned for a future release. See `docs/architecture.md`
-  "Known limitations".
+  "Roadmap".
 
 ## 9. String Equality
 

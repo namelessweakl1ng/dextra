@@ -18,7 +18,7 @@ Verify everything works:
 
 ```bash
 python -m pytest                 # 96 tests, ~1 second
-dextra --version                 # Dextra 0.1.0
+dextra --version                 # Dextra 0.2.0
 dextra run examples/hello.dx     # Hello, Dextra!
 ```
 
