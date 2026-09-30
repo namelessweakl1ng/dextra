@@ -49,6 +49,8 @@ genuine native ELF binary produced through the LLVM toolchain.
   `for x in array`, `break`, `continue`.
 - **Arrays** — `[1, 2, 3]`, indexing, element mutation on `let mut` arrays.
 - **Structs** — nominal types with named fields, struct literals, field access.
+- **Enums and pattern matching** — unit variants, exhaustive `match`
+  expressions, and wildcard arms.
 - **Strings** — escape sequences (`\n \t \\ \" \0`), `+` concatenation.
 - **Standard library** — builtin `print`, `println`, `length`.
 - **Diagnostics** — Rust-style errors with code, source line, caret underline,
@@ -109,7 +111,7 @@ pip install -e .
 Verify:
 
 ```bash
-dextra --version                # Dextra 0.1.3 (also reports Python + LLVM versions)
+dextra --version                # Dextra 0.2.0 (also reports Python + LLVM versions)
 dextra run examples/hello.dx    # Hello, Dextra!
 ```
 
@@ -286,28 +288,28 @@ dextra/
 │   ├── lexer/  parser/  ast/
 │   ├── semantic/  types/  ir/
 │   ├── codegen/  runtime/  diagnostics/
-│   ├── formatter/  modules/  cli/
+│   ├── formatter/  modules/  cli/   # modules currently contains a placeholder package
 │   └── pipeline.py                  top-level compile() driver
 ├── tests/                           unit + golden + negative + e2e
-├── examples/                        13 sample .dx programs
+├── examples/                        15 sample .dx programs
 └── benchmarks/                      (planned)
 ```
 
 ## Roadmap
 
-Dextra is at v0.1.  Planned future work:
+Dextra is at v0.2.0. Planned future work:
 
 - Short-circuit evaluation for `&&` / `||`.
 - Bounds checking on array access.
 - Implicit `Int` → `Float` promotion in mixed arithmetic.
 - Module system (`import` / `export` keywords are reserved).
-- Enums with payload variants and `match` expressions.
+- Payload-carrying enum variants (unit variants and `match` are implemented).
 - Methods on structs (`impl`).
 - Closures and first-class function values.
 - Garbage collection or a simple ownership model.
 - Optimization passes (constant folding, dead-code elimination).
 
-See [`CHANGELOG.md`](CHANGELOG.md) for the v0.1 feature set and known limitations.
+See [`CHANGELOG.md`](CHANGELOG.md) for the v0.2.0 feature set and known limitations.
 
 ## Technical details
 
@@ -321,7 +323,7 @@ See [`CHANGELOG.md`](CHANGELOG.md) for the v0.1 feature set and known limitation
   for mutable locals, matching LLVM's lowering model.
 - **Runtime** is a single ~120-line C file (`runtime/runtime.c`) providing
   `DxString`, `DxArray`, and `dx_print_*` overloads.  Memory is `malloc`'d
-  and never freed in v0.1.
+  and never freed in v0.2.0.
 
 ## Contributing
 

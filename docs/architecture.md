@@ -180,7 +180,7 @@ src/dextra/
 ├── runtime/
 │   └── runtime.c          # dx_* runtime functions
 ├── modules/
-│   └── resolver.py        # (stub for v0.2)
+│   └── __init__.py        # placeholder package; module resolution is not implemented
 ├── formatter/
 │   └── formatter.py       # dextra fmt
 └── cli/
@@ -199,9 +199,9 @@ The Dextra runtime (`runtime/runtime.c`) provides:
 * `dx_string_new`, `dx_string_concat`, `dx_string_print`, `dx_string_println`, `dx_string_length`.
 * `dx_print_int`, `dx_print_float`, `dx_print_bool`, `dx_println_int`, etc.
 * `DxArray` — a length-prefixed, type-erased array.
-* `dx_array_new_int(n)`, `dx_array_get_int`, `dx_array_set_int`.
+* `dx_array_new(n)`, `dx_array_get`, `dx_array_set`.
 
-The runtime is deliberately minimal. Memory is allocated with `malloc` and never freed in v0.1; this is documented in `docs/language-spec.md`.
+The runtime is deliberately minimal. Memory is allocated with `malloc` and never freed in v0.2.0.
 
 ## 6. Testing Strategy
 
@@ -218,7 +218,7 @@ See `docs/getting-started.md` for how to run the suite.
 |-------|--------|-------|
 | 0 — Specification       | done   | this document + sibling docs |
 | 1 — Lexer               | done   | full token coverage |
-| 2 — Parser              | done   | recursive descent, all v0.1 grammar |
+| 2 — Parser              | done   | recursive descent, current grammar |
 | 3 — Semantic analysis   | done   | symbols + scopes + name resolution |
 | 4 — Type system         | done   | inference + checking |
 | 5 — Dextra IR           | done   | Module/Function/BasicBlock/Instruction |
@@ -229,4 +229,4 @@ See `docs/getting-started.md` for how to run the suite.
 | 10 — CLI                | done   | build/run/check/emit-ir/fmt/new |
 | 11 — Modules            | planned| `import`/`export` reserved |
 | 12 — Formatter          | done   | deterministic, opinionated |
-| 13 — Advanced features  | planned| enums, match, methods, closures |
+| 13 — Advanced features  | partial| unit enums and match implemented; payload variants, methods, and closures planned |
