@@ -9,6 +9,7 @@ program        ::= declaration* EOF ;
 
 declaration    ::= function_decl
                  | struct_decl
+                 | enum_decl
                  ;
 
 function_decl  ::= "fn" IDENTIFIER "(" [ parameter_list ] ")" [ "->" type ] block ;
@@ -22,6 +23,8 @@ struct_decl    ::= "struct" IDENTIFIER "{" [ field_list ] "}" ;
 field_list     ::= field ( "," field )* [ "," ] ;
 
 field          ::= IDENTIFIER ":" type ;
+
+enum_decl      ::= "enum" IDENTIFIER "{" [ IDENTIFIER ( "," IDENTIFIER )* [ "," ] ] "}" ;
 ```
 
 ## 2. Statements
@@ -38,6 +41,7 @@ statement      ::= let_stmt
                  | for_stmt
                  | assignment
                  | call_expr
+                 | match_expr
                  | block
                  ;
 
@@ -69,7 +73,7 @@ lvalue         ::= IDENTIFIER
                  ;
 ```
 
-**Note on statement parsing:** Dextra statements are not semicolon-terminated. The parser disambiguates `assignment` from `expression_statement` by looking at whether the parsed expression is a valid lvalue followed by `=`. A bare expression as a statement is allowed only if it is a function call (other bare expressions, like `1 + 2`, are rejected as unused).
+**Note on statement parsing:** Dextra statements are not semicolon-terminated. The parser disambiguates `assignment` from `expression_statement` by looking at whether the parsed expression is a valid lvalue followed by `=`. A bare expression as a statement is allowed only if it is a function call or match expression (other bare expressions, like `1 + 2`, are rejected as unused).
 
 ## 3. Expressions
 
@@ -105,6 +109,7 @@ primary        ::= INTEGER
                  | "(" expression ")"
                  | array_literal
                  | struct_literal
+                 | match_expr
                  ;
 
 argument_list  ::= expression ( "," expression )* [ "," ] ;
@@ -114,6 +119,10 @@ array_literal  ::= "[" [ expression ( "," expression )* [ "," ] ] "]" ;
 struct_literal ::= IDENTIFIER "{" [ struct_field_init ( "," struct_field_init )* [ "," ] ] "}" ;
 
 struct_field_init ::= IDENTIFIER ":" expression ;
+
+match_expr     ::= "match" expression "{" [ match_arm ( "," match_arm )* [ "," ] ] "}" ;
+match_arm      ::= pattern "=>" expression ;
+pattern        ::= IDENTIFIER "." IDENTIFIER | "_" ;
 ```
 
 ## 4. Types
@@ -125,7 +134,7 @@ type           ::= "Int"
                  | "String"
                  | "Void"
                  | array_type
-                 | IDENTIFIER                // struct name
+                 | IDENTIFIER                // struct or enum name
                  ;
 
 array_type     ::= "[" type "]" ;

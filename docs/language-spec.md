@@ -1,7 +1,7 @@
 # Dextra Language Specification
 
-**Version:** 0.1.0
-**Status:** Phase 0 specification — describes the language as implemented in this release.
+**Version:** 0.2.0
+**Status:** Current implementation reference — describes the language as implemented in this release.
 
 ## 1. Overview
 
@@ -16,12 +16,12 @@ Design goals:
 5. Strong, layered compiler architecture (Lexer → Parser → AST → Semantic → Types → IR → LLVM).
 6. Useful, source-location-aware diagnostics.
 
-Non-goals for v0.1:
+Non-goals for v0.2.0:
 
 * Ownership / borrowing / lifetimes (Rust-style).
 * Generics.
 * Closures (planned for a later milestone).
-* Pattern matching on algebraic enums (planned).
+* Payload variants and destructuring (unit enums and pattern matching are implemented).
 * A package registry.
 
 ## 2. Lexical Structure
@@ -40,7 +40,7 @@ Whitespace (space, tab, carriage return) separates tokens but is otherwise insig
 // single-line comment, runs to end of line
 ```
 
-Block comments are not supported in v0.1.
+Block comments are not supported in v0.2.0.
 
 ### 2.4 Identifiers
 
@@ -65,7 +65,7 @@ Keywords cannot be used as identifiers.
 integer ::= [0-9]+
 ```
 
-Integer literals are 64-bit signed (`i64` in LLVM) and represented internally as `Int`. Hexadecimal (`0x...`), binary (`0b...`), and octal (`0o...`) literals are not supported in v0.1.
+Integer literals are 64-bit signed (`i64` in LLVM) and represented internally as `Int`. Hexadecimal (`0x...`), binary (`0b...`), and octal (`0o...`) literals are not supported in v0.2.0.
 
 ### 2.7 Float Literals
 
@@ -105,7 +105,7 @@ Escape sequences:
 &&  ||  !
 =
 (  )  {  }  [  ]
-:  ;  ,  .  ->  ..
+:  ;  ,  .  ->  =>  ..
 ```
 
 ## 3. Types
@@ -126,10 +126,11 @@ Escape sequences:
 |-----------------|------------------|
 | `[T]`           | `[Int]` — array of `Int` |
 | `struct Name`   | user-defined     |
+| `enum Name`     | nominal unit-variant enum |
 
 ### 3.3 Function Types
 
-Function types are not first-class in v0.1. Functions are named and called by name; pointers to functions are not yet supported.
+Function types are not first-class in v0.2.0. Functions are named and called by name; pointers to functions are not yet supported.
 
 ## 4. Variables
 
@@ -164,10 +165,11 @@ fn name(param: Type, ...) -> ReturnType {
 ```
 
 * `main` is the program entry point and must return `Int`.
-* `main` may take no parameters in v0.1.
-* All paths through a non-`Void` function must either `return` or call a function (this is not enforced in v0.1 — see roadmap).
+* `main` may take no parameters in v0.2.0.
+* Missing returns in non-`Void` functions are compile errors (`E0218`);
+  see `docs/type-system.md` §7 for the current control-flow analysis.
 * Functions may be recursive.
-* Functions are not first-class values in v0.1.
+* Functions are not first-class values in v0.2.0.
 
 ## 6. Strings
 
@@ -190,11 +192,11 @@ xs[0] = 10
 let empty: [Float] = []      // explicit element type required for []
 ```
 
-* Arrays in v0.1 are fixed-length, heap-allocated, and passed by reference.
+* Arrays in v0.2.0 are fixed-length, heap-allocated, and passed by reference.
 * Element type must be uniform.
 * Empty array literals require an explicit element-type annotation on the
   binding (`let xs: [T] = []`).  An untyped `let xs = []` is an error.
-* Out-of-bounds access is undefined behavior in v0.1 (no bounds checks).
+* Out-of-bounds access is undefined behavior in v0.2.0 (no bounds checks).
   Negative indices are also undefined behavior.  A future release will
   add checked indexing.
 * Element storage: the runtime `DxArray` stores each element in an `i64`
@@ -220,7 +222,19 @@ println(u.name)
 * Field access uses `.`.
 * Field order in construction need not match declaration order, but all fields must be supplied.
 * Trailing commas in field lists are allowed.
-* Methods are not supported in v0.1 (planned).
+* Methods are not supported in v0.2.0 (planned).
+
+### 8.1 Enums and match
+
+`enum Color { Red, Green, Blue }` declares a nominal enum with unit variants.
+`Color.Red` has type `Color` and is represented by its zero-based `i64` tag.
+Payload variants are not supported.
+
+`match color { Color.Red => 1, Color.Green => 2, Color.Blue => 3 }`
+is an expression. Arm bodies are expressions with matching types; calls returning
+`Void` can be used for statement-style matches. Patterns are qualified enum
+variants or `_`. Matches must cover every variant or include a wildcard;
+non-exhaustive matches and duplicate arms are compile errors.
 
 ## 9. Control Flow
 
@@ -276,7 +290,7 @@ From lowest to highest:
 | 6          | `- !` (unary) | prefix  | unary |
 | 7          | `[] () .`  | postfix       | indexing, call, field access |
 
-**Eager evaluation**: `&&` and `||` in v0.1 are eager — both operands are
+**Eager evaluation**: `&&` and `||` in v0.2.0 are eager — both operands are
 always evaluated, even when the result is determined by the left operand
 alone.  `false && side_effect()` will call `side_effect()`.  This is
 documented behavior, not a bug.  Short-circuit evaluation is a planned
@@ -301,7 +315,7 @@ roadmap feature.
 * Mutating a field of an immutable struct → `E0301`.
 * Reassigning a parameter is allowed (parameters are implicitly mutable).
 
-## 13. Modules (planned, not in v0.1)
+## 13. Modules (planned, not in v0.2.0)
 
 The `import` and `export` keywords are reserved but unimplemented. Each `.dx` file is currently a self-contained program.
 
@@ -313,4 +327,4 @@ The following names are in scope in every Dextra program without an import:
 |------|------|-------|
 | `print(x)`   | `fn(x: T) -> Void` for `T ∈ {Int, Float, Bool, String}` | prints without trailing newline |
 | `println(x)` | `fn(x: T) -> Void` for `T ∈ {Int, Float, Bool, String}` | prints with trailing newline |
-| `println()`  | `fn() -> Void` | prints just a newline |
+| `length(x)` | `fn(x: String or [T]) -> Int` | string byte length or array element count |

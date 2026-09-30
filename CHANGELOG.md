@@ -11,7 +11,7 @@ is added but existing programs continue to compile.
 
 ### Added — Language Features
 
-- **Enum declarations**: `enum Color { Red, Green, Blue }`.  v0.1 enums
+- **Enum declarations**: `enum Color { Red, Green, Blue }`.  v0.2.0 enums
   are *unit-variant only* (no payload).  Each variant has a stable tag
   (its 0-based index in declaration order).  Enum names live in the
   global scope alongside structs and functions.

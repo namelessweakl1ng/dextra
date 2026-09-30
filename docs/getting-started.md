@@ -76,7 +76,7 @@ python -m pytest tests/
 End-to-end (golden) tests:
 
 ```bash
-python -m pytest tests/integration/
+python -m pytest tests/test_integration.py
 ```
 
 ## Troubleshooting

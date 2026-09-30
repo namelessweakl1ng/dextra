@@ -33,16 +33,20 @@
              Link (gcc) → Native Binary
 ```
 
-Every stage is independently testable. Stage N never reaches back into stage N-1's internal data structures — it consumes the typed output of the previous stage.
+The pipeline stages are independently testable. Name resolution and type checking
+are combined in `Analyzer.analyze()` (`semantic/analyzer.py`); there is no
+separate type-checker pass or `TypedProgram` class. Downstream lowering consumes
+the resulting `AnalyzedProgram` and queries its AST symbol/type attachments.
 
 ## 2. Stage Contracts
 
 ### 2.1 Lexer
 
 **Input:**  raw source string + filename.
-**Output:** `list[Token]` ending with an `EOF` token. Errors are emitted as `Diagnostic` objects with `kind=Error` and code `E0001`.
+**Output:** `list[Token]` ending with an `EOF` token. Errors are emitted as `Diagnostic` objects with `severity=Severity.ERROR` and code `E0001`.
 **Invariants:**
-* Every `Token` carries a `SourceSpan` with `filename`, `line`, `column`, `start_offset`, `end_offset`.
+* Every `Token` carries a `SourceSpan` with `start` and `end` positions (each with `filename`, `line`, `column`,
+  and `offset`).
 * Comments and whitespace are not produced as tokens — they are consumed and discarded.
 * The lexer never throws raw Python exceptions on bad input; it emits a `Diagnostic` and recovers by skipping the offending character.
 
@@ -59,7 +63,10 @@ Every stage is independently testable. Stage N never reaches back into stage N-1
 ### 2.3 Semantic Analysis
 
 **Input:**  `Program` AST.
-**Output:** `AnalyzedProgram` — the same AST with symbols resolved (each `IdentifierExpression` carries a back-pointer to its declaration), a populated `SymbolTable`, and a list of diagnostics.
+**Output:** `AnalyzedProgram` — contains the AST, `TypeContext`, global `Scope`,
+and struct/function/enum information. Resolved identifiers carry `_resolved`
+`Symbol` attachments; expression types are stored in `_type`. Diagnostics are
+reported to the shared `DiagnosticEngine`.
 **Invariants:**
 * Every identifier that survives this stage is bound to a declaration.
 * Unknown identifiers are reported as `E0100`.
@@ -68,23 +75,25 @@ Every stage is independently testable. Stage N never reaches back into stage N-1
 
 ### 2.4 Type Checker
 
-**Input:**  `AnalyzedProgram`.
-**Output:** `TypedProgram` — the same AST with a `Type` attached to every expression node, plus diagnostics.
+**Input:** AST expressions and lexical scopes during `Analyzer.analyze()`.
+**Output:** expression type attachments within the same `AnalyzedProgram`;
+this work is part of semantic analysis, not a separate pipeline call.
 **Invariants:**
 * Every expression that survives this stage has a non-`Unknown` type.
 * Type mismatches are reported as `E0200`.
 * Invalid assignments (immutable target, type mismatch) are reported as `E0201` or `E0301`.
 * Invalid function calls (wrong arity, wrong argument types) are reported as `E0202`.
-* Conditions in `if`/`while`/`for` headers must be `Bool` — `E0203`.
+* Conditions in `if`/`while` headers must be `Bool` — `E0203`.
+  Range-loop bounds must be `Int`; array loops require an array.
 
 ### 2.5 Dextra IR
 
-**Input:**  `TypedProgram`.
+**Input:**  `AnalyzedProgram` with resolved symbols and expression types.
 **Output:** `ir.Module` — a list of `ir.Function`s, each containing `ir.BasicBlock`s of `ir.Instruction`s.
 **Invariants:**
 * Every function has a unique `entry` block.
 * Every block ends with a terminator (`Return`, `Branch`, or `CondBranch`).
-* Every `Value` has a `DextraType`.
+* Every `Value` has a `Type`.
 * The IR is in SSA form for temporaries; locals are explicit `Alloca`+`Load`/`Store` (matches LLVM lowering).
 
 ### 2.6 LLVM Backend
@@ -180,7 +189,7 @@ src/dextra/
 ├── runtime/
 │   └── runtime.c          # dx_* runtime functions
 ├── modules/
-│   └── resolver.py        # (stub for v0.2)
+│   └── __init__.py        # placeholder only; no module resolver implemented
 ├── formatter/
 │   └── formatter.py       # dextra fmt
 └── cli/
@@ -196,12 +205,13 @@ The diagnostic engine (see `docs/diagnostics.md`) is shared across all stages. E
 The Dextra runtime (`runtime/runtime.c`) provides:
 
 * `DxString` — a length-prefixed UTF-8 string struct.
-* `dx_string_new`, `dx_string_concat`, `dx_string_print`, `dx_string_println`, `dx_string_length`.
+* `dx_string_new`, `dx_string_concat`, `dx_string_print`, `dx_string_println`, `dx_string_length`, `dx_string_eq`.
 * `dx_print_int`, `dx_print_float`, `dx_print_bool`, `dx_println_int`, etc.
 * `DxArray` — a length-prefixed, type-erased array.
-* `dx_array_new_int(n)`, `dx_array_get_int`, `dx_array_set_int`.
+* `dx_array_new(n)`, `dx_array_length`, `dx_array_get`, `dx_array_set`.
+* `dx_alloc_struct` — heap allocation for struct literals.
 
-The runtime is deliberately minimal. Memory is allocated with `malloc` and never freed in v0.1; this is documented in `docs/language-spec.md`.
+The runtime is deliberately minimal. Memory is allocated with `malloc` and never freed in v0.2.0; this is documented in `docs/language-spec.md`.
 
 ## 6. Testing Strategy
 
@@ -218,15 +228,15 @@ See `docs/getting-started.md` for how to run the suite.
 |-------|--------|-------|
 | 0 — Specification       | done   | this document + sibling docs |
 | 1 — Lexer               | done   | full token coverage |
-| 2 — Parser              | done   | recursive descent, all v0.1 grammar |
+| 2 — Parser              | done   | recursive descent, unit enums and match expressions included |
 | 3 — Semantic analysis   | done   | symbols + scopes + name resolution |
 | 4 — Type system         | done   | inference + checking |
 | 5 — Dextra IR           | done   | Module/Function/BasicBlock/Instruction |
 | 6 — LLVM backend        | done   | via llvmlite.ir |
 | 7 — Native execution    | done   | llvmlite.binding + gcc link |
 | 8 — Runtime             | done   | strings, arrays, print |
-| 9 — Standard library    | partial| builtin print/println only |
+| 9 — Standard library    | partial| builtin print/println and length |
 | 10 — CLI                | done   | build/run/check/emit-ir/fmt/new |
 | 11 — Modules            | planned| `import`/`export` reserved |
 | 12 — Formatter          | done   | deterministic, opinionated |
-| 13 — Advanced features  | planned| enums, match, methods, closures |
+| 13 — Advanced features  | partial| unit enums + match done; payload variants, methods, closures planned |

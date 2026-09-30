@@ -17,8 +17,8 @@ pip install -e ".[dev]"          # installs dextra + pytest
 Verify everything works:
 
 ```bash
-python -m pytest                 # 96 tests, ~1 second
-dextra --version                 # Dextra 0.1.0
+python -m pytest                 # full existing suite
+dextra --version                 # Dextra 0.2.0
 dextra run examples/hello.dx     # Hello, Dextra!
 ```
 
@@ -33,7 +33,7 @@ src/dextra/         compiler source
 ├── parser/         recursive-descent parser
 ├── ast/            AST node dataclasses
 ├── semantic/       symbols, scopes, name resolution, type checking
-├── types/          type system (Primitive, Array, Struct, Function)
+├── types/          type system (Primitive, Array, Struct, Enum, Function)
 ├── ir/             Dextra IR (Module/Function/BasicBlock/Instruction)
 ├── codegen/        LLVM backend (llvmlite) + native linker
 ├── runtime/        C runtime (strings, arrays, printing)

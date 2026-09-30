@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+
+# Dextra / LLVM build output
+*.o
+*.ll
+*.out
+*.exe
+*.bad.ll
+# Default extensionless example binaries; keep example source files.
+/examples/arithmetic
+/examples/arrays
+/examples/calculator
+/examples/conditions
+/examples/enums
+/examples/factorial
+/examples/fibonacci
+/examples/functions
+/examples/hello
+/examples/loops
+/examples/match
+/examples/recursion
+/examples/strings
+/examples/structs
+/examples/variables
+
+# Coverage / tooling
+.coverage
+.coverage.*
+htmlcov/
+.ruff_cache/
+.mypy_cache/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
