@@ -1,1 +1,1 @@
-"""Module system placeholder — reserved for v0.2."""
+"""Placeholder package; module resolution is not implemented yet."""

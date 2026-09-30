@@ -14,6 +14,7 @@ Type
 │   └── Void
 ├── ArrayType          { element_type: Type }
 ├── StructType         { name, fields: list[(name, Type)] }
+├── EnumType           { name, variants: dict[name, tag] }
 └── FunctionType       { params: list[Type], return_type: Type }
 ```
 
@@ -32,6 +33,7 @@ implemented in `src/dextra/codegen/llvm_backend.py` (`_llvm_type`):
 | `String`    | `%DxString*`          | `%DxString*`           | by reference (heap)     |
 | `[T]`       | `%DxArray*`            | `%DxArray*`            | by reference (heap)     |
 | Struct      | `%struct.Name*`       | `%struct.Name*`         | by reference (heap)     |
+| Enum        | `i64`                 | `i64`                   | by value                |
 | `Void`      | `void`                | (n/a)                  | only as function return |
 
 Implications:
@@ -77,7 +79,7 @@ Implications:
 | `/` | Float  | Float  | Float  | |
 | `+` | String | String | String | string concat (lowered to runtime call) |
 
-Mixing `Int` and `Float` operands is a **type error** (no implicit promotion in v0.1).
+Mixing `Int` and `Float` operands is a **type error** (no implicit promotion in v0.2.0).
 
 ### 2.3 Comparison
 
@@ -86,7 +88,7 @@ Mixing `Int` and `Float` operands is a **type error** (no implicit promotion in 
 | `== !=`| same type, scalar only      | `Bool` |
 | `< > <= >=` | `Int` or `Float` (same) | `Bool` |
 
-Comparing `String`s with `<` is a type error in v0.1. `==` on strings is allowed and lowered to a runtime `strcmp`-based check.
+Comparing `String`s with `<` is a type error in v0.2.0. `==` on strings is allowed and lowered to a runtime `strcmp`-based check.
 
 ### 2.4 Boolean
 
@@ -168,7 +170,7 @@ If an explicit annotation is present (`let x: T = e`), the inferred type of `e` 
 
 ## 5. Type Compatibility
 
-Dextra has **no implicit conversions** in v0.1. The following are all errors:
+Dextra has **no implicit conversions** in v0.2.0. The following are all errors:
 
 ```dextra
 let x: Int = 1.5           // E0200
@@ -215,7 +217,7 @@ let s: String = "a" + 1    // E0200 (Int ≠ String)
   prove the runtime value is zero). The behavior at runtime is undefined.
 * **Floating-point division by 0.0** produces `±Inf` or `NaN` per IEEE 754.
   This is also warned about at compile time when the divisor is a literal.
-* **Out-of-bounds array access** is **undefined behavior** in v0.1.
+* **Out-of-bounds array access** is **undefined behavior** in v0.2.0.
   Bounds checking is planned for a future release. See `docs/architecture.md`
   "Known limitations".
 
@@ -224,4 +226,3 @@ let s: String = "a" + 1    // E0200 (Int ≠ String)
 String `==` and `!=` are supported and lowered to a runtime `dx_string_eq`
 call that performs a byte-level comparison. Strings of different lengths
 are always unequal; strings of the same length are compared with `memcmp`.
-

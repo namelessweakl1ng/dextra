@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+
+# Dextra / LLVM build output
+*.o
+*.ll
+*.out
+*.exe
+*.bad.ll
+
+# Coverage / tooling
+.coverage
+htmlcov/
+.ruff_cache/
+.mypy_cache/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
